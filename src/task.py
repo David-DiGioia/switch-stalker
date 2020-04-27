@@ -30,9 +30,7 @@ class Task:
             logger.log("Finished storing cookies.", self.id)
             time.sleep(10000)
         else:
-            for cookie in pickle.load(open("Cookies.pkl", "rb")):
-                logger.log(f"Loading cookie {cookie}", self.id)
-                self.driver.add_cookie(cookie)
+            self.website.login(self.driver, self.timeout, self.id)
 
     def main_loop(self):
         while True:

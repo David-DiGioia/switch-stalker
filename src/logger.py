@@ -6,7 +6,7 @@ log_file = None
 def init_logger():
     global log_file
     date = str(datetime.datetime.now()).replace(':', '.')
-    log_file = open('..\\log\\' + date + '.txt', 'w')
+    log_file = open('..\\log\\Logfile' + date + '.txt', 'w')
 
 
 def close_logger():

@@ -22,9 +22,9 @@ def main():
     task1 = task.Task(target_neon)
     task1.start()
 
-    target_grey = websites.Target(target_grey_url)
-    task2 = task.Task(target_grey)
-    task2.start()
+    # target_grey = websites.Target(target_grey_url)
+    # task2 = task.Task(target_grey)
+    # task2.start()
 
     # if options.debug:
     #     target_in_stock = websites.Target(target_url_in_stock)
