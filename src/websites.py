@@ -100,7 +100,9 @@ class Target:
         if options.debug:
             logger.log(f"This is where we would check out. Button is: {final_button}", task_id)
         else:
-            final_button.click()
+            # Executing script directly instead of clicking to hopefully
+            # avoid getting selenium.common.exceptions.ElementClickInterceptedException
+            driver.execute_script("arguments[0].click();", final_button)
             logger.log(f"SUCCESSFUL PURCHASE AT {self.url}", task_id)
         return True
 

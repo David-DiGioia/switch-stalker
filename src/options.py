@@ -1,7 +1,7 @@
 import logger
 
 # CAUTION setting debug to False will result in actual purchases
-debug = True
+debug = False
 run_tests = False
 
 # Credit card number and security code
