@@ -1,11 +1,13 @@
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 import pickle
 import logger
 import time
 import threading
+import options
 
-rewrite_cookies = False
 thread_id = 0
+
 
 class Task:
     def __init__(self, website, sleep_time=1, timeout=10):
@@ -20,8 +22,8 @@ class Task:
         # We load the cookies so that we'll be logged in
         self.driver.get(website.url)
 
-        if rewrite_cookies:
-            logger.log("Enter something to continue", self.id)
+        if options.rewrite_cookies:
+            logger.log("Enter anything to continue, once you have logged in.", self.id)
             input()
             logger.log("continuing....", self.id)
             pickle.dump(self.driver.get_cookies(), open("Cookies.pkl", "wb"))
@@ -37,11 +39,27 @@ class Task:
             if not self.website.in_stock(self.driver, self.timeout, self.id):
                 logger.log(f"{self.website.name} is out of stock. Retrying.", self.id)
                 time.sleep(self.sleep_time)
-                self.driver.get(self.website.url)
+                try:
+                    self.driver.get(self.website.url)
+                except TimeoutException:
+                    logger.log(f"Reloading webpage timed out...", self.id)
+                except:
+                    logger.log(f"Unexpected error loading page... Continuing.", self.id)
                 continue
             logger.log(f"{self.website.name} is in stock!", self.id)
-            self.website.add_to_cart(self.driver, self.timeout, self.id)
-            if self.website.checkout(self.driver, self.timeout, self.id):
+
+            try:
+                self.website.add_to_cart(self.driver, self.timeout, self.id)
+            except:
+                logger.log("Exception occured while adding to cart...", self.id)
+                continue
+
+            try:
+                purchase_result = self.website.checkout(self.driver, self.timeout, self.id)
+            except:
+                logger.log(f"Exception occured while checking out...", self.id)
+                continue
+            if purchase_result:
                 logger.log(f"Purchase successful from {self.website.url}", self.id)
                 break
 
