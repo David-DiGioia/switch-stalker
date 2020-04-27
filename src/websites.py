@@ -1,7 +1,8 @@
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
 import time
 import logger
 import options
@@ -27,7 +28,10 @@ def wait_css(css, driver, timeout, task_id):
 def wait_click_css(css, driver, timeout, task_id):
     element = wait_css(css, driver, timeout, task_id)
     if element is not None:
-        element.click()
+        try:
+            element.click()
+        except ElementClickInterceptedException:
+            driver.execute_script("arguments[0].click();", element)
         return element
     return None
 
@@ -135,105 +139,65 @@ class Target:
                 return self.checkout_starting_from(3, driver, timeout, task_id)
 
     def login(self, driver, timeout, task_id):
+        driver.get(self.url)
         for cookie in pickle.load(open("Cookies.pkl", "rb")):
             logger.log(f"Loading cookie {cookie}", task_id)
             driver.add_cookie(cookie)
 
 
-smyth_in_stock_url = 'https://www.smythstoys.com/uk/en-gb/video-games-and-tablets/nintendo-gaming/nintendo-switch/nintendo-switch-games/super-mario-party-nintendo-switch/p/168632'
 
 
 class SmythsToys:
     def __init__(self, url, online=True):
         self.name = 'SmythsToys'
         self.url = url
-        if online:
-            self.purchase_button_html = button_online_html
-            self.purchase_button_css = button_online_css
-            self.no_purchase_button_css = no_button_online_css
-        else:
-            self.purchase_button_html = ''
-            self.purchase_button_css = ''
-            self.no_purchase_button_css = ''
+
 
     def in_stock(self, driver, timeout, task_id):
-        if wait_css(self.purchase_button_css + ', ' + self.no_purchase_button_css, driver, timeout, task_id):
-            return self.purchase_button_html in driver.page_source
-        return False
+        add_to_basket_button = wait_css('#addToCartButton', driver, 5, task_id)
+        return add_to_basket_button is not None
 
     def add_to_cart(self, driver, timeout, task_id):
         # Click purchase button
-        wait_click_css(self.purchase_button_css, driver, timeout, task_id)
-        # Exit from popup
-        wait_click_css('button[aria-label="close"][type="button"][style="position: absolute; top: 5px; right: 5px;"]', driver, timeout, task_id)
-        wait_click_css('#cart', driver, timeout, task_id)
+        wait_click_css('#addToCartButton', driver, timeout, task_id)
+        # Go to cart
+        wait_click_css('#showCartPopup', driver, timeout, task_id)
 
     # Checkout once we know what information is already filled out for us.
     def checkout_starting_from(self, step, driver, timeout, task_id):
-        # Choose address
-        if step <= 0:
-            # Select the address
-            wait_click_css(select_address_html, driver, timeout, task_id)
-            # Save and continue
-            wait_click_css('[data-test="save-and-continue-button"][type="button"][class="Button-bwu3xu-0 hYDopb"]', driver, timeout, task_id)
-
-        # Enter credit card number
-        if step <= 1:
-            # Click box and enter credit card number
-            ccn_input_box = wait_click_css('#creditCardInput-cardNumber', driver, timeout, task_id)
-            ccn_input_box.send_keys(options.ccn)
-            # Click 'confirm card' button
-            wait_click_css('button[data-test="verify-card-button"][type="button"][class="Button-bwu3xu-0 hYDopb"]', driver, timeout, task_id)
-
-        # Enter security code
-        if step <= 2:
-            # Click box and enter credit card number
-            sc_input_box = wait_click_css('#creditCardInput-cvv', driver, timeout, task_id)
-            sc_input_box.send_keys(options.sc)
-            # <button data-test="save-and-continue-button" type="button" class="Button-bwu3xu-0 hYDopb">
-            wait_click_css('button[data-test="save-and-continue-button"][type="button"][class="Button-bwu3xu-0 hYDopb"]', driver, timeout, task_id)
-
-        # Make the purchase!!!
-        final_button = wait_css('button[class="Button__ButtonWithStyles-y45r97-0 eYxNTC"][data-test="placeOrderButton"]', driver, timeout, task_id)
-        if final_button is None:
-            logger.log("Failed at final button.", task_id)
-            return False
-        if options.debug:
-            logger.log(f"This is where we would check out. Button is: {final_button}", task_id)
-        else:
-            # Executing script directly instead of clicking to hopefully
-            # avoid getting selenium.common.exceptions.ElementClickInterceptedException
-            driver.execute_script("arguments[0].click();", final_button)
-            logger.log(f"SUCCESSFUL PURCHASE AT {self.url}", task_id)
-        return True
+        pass
 
     # Make the purchase. Returns true if successful.
     def checkout(self, driver, timeout, task_id):
-        # Click 'I'm ready to checkout' button
-        if wait_click_css('button[class="Button__ButtonWithStyles-y45r97-0 gmmYfU"][data-test="checkout-button"]', driver, timeout, task_id) is None:
-            return False
+        wait_click_css('#checkoutOnCart', driver, timeout, task_id)
+        input_box = wait_click_css('#cardNumberPart1', driver, timeout, task_id)
+        input_box.send_keys(options.ccn)
+        input_box = wait_click_css('#cardCvn', driver, timeout, task_id)
+        input_box.send_keys(options.sc)
+        # Select month
+        wait_click_css('button[type="button"][class="btn dropdown-toggle selectpicker contact_select"][data-toggle="dropdown"][data-id="expiryMonth"]', driver, timeout, task_id)
+        wait_click_css('li[rel="' + str(int(options.month)) + '"]', driver, timeout, task_id)
+        #Select Year
+        wait_click_css('button[type="button"][class="btn dropdown-toggle selectpicker contact_select"][data-toggle="dropdown"][data-id="expiryYear"]', driver, timeout, task_id)
+        element = WebDriverWait(driver, timeout).until(EC.element_to_be_clickable((By.LINK_TEXT, "20" + options.year[:-1])))
+        element.click()
+        # wait_click_css('label[class="control control--checkbox fnt_12"]', driver, timeout, task_id)
+        agree_button = driver.find_elements_by_xpath("//*[contains(text(), 'By placing the order, I have read and agreed to the')]")
+        agree_button[0].click()
 
-        while True:
-            # Select address
-            if immediate_active_css(select_address_html, driver) is not None:
-                logger.log("Checking out from stage 0 (address).", task_id)
-                return self.checkout_starting_from(0, driver, timeout, task_id)
-
-            # Enter credit card number
-            if immediate_active_css('#creditCardInput-cardNumber', driver) is not None:
-                logger.log("Checking out from stage 1 (credit card number).", task_id)
-                return self.checkout_starting_from(1, driver, timeout, task_id)
-
-            # Do security code here
-            if immediate_active_css('#creditCardInput-cvv', driver) is not None:
-                logger.log("Checking out from stage 2 (security code).", task_id)
-                return self.checkout_starting_from(2, driver, timeout, task_id)
-
-            # Check for final button
-            if immediate_active_css('button[class="Button__ButtonWithStyles-y45r97-0 eYxNTC"][data-test="placeOrderButton"]', driver):
-                logger.log("Checking out from stage 3 (Place order button).", task_id)
-                return self.checkout_starting_from(3, driver, timeout, task_id)
+        if options.debug:
+            logger.log("This is where we would checkout", task_id)
+            return True
+        else:
+            logger.log("Placing order", task_id)
+            wait_click_css('#placeOrder', driver, timeout, task_id)
+            return True
 
     def login(self, driver, timeout, task_id):
         driver.get('https://www.smythstoys.com/uk/en-gb/login')
-
+        input_box = wait_click_css('#j_username', driver, timeout, task_id)
+        input_box.send_keys(options.email)
+        input_box = wait_click_css('#j_password', driver, timeout, task_id)
+        input_box.send_keys(options.password)
+        wait_click_css('button[type="submit"][class="btn btn-blue margn_tp_bt_20"]', driver, timeout, task_id)
+        driver.get(self.url)

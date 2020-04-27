@@ -19,10 +19,8 @@ class Task:
         self.timeout = timeout
         self.driver = webdriver.Firefox(executable_path="../lib/geckodriver")
 
-        # We load the cookies so that we'll be logged in
-        self.driver.get(website.url)
-
         if options.rewrite_cookies:
+            self.driver.get(website.url)
             logger.log("Enter anything to continue, once you have logged in.", self.id)
             input()
             logger.log("continuing....", self.id)
@@ -41,21 +39,24 @@ class Task:
                     self.driver.get(self.website.url)
                 except TimeoutException:
                     logger.log(f"Reloading webpage timed out...", self.id)
-                except:
+                except Exception as e:
                     logger.log(f"Unexpected error loading page... Continuing.", self.id)
+                    logger.log(str(e))
                 continue
             logger.log(f"{self.website.name} is in stock!", self.id)
 
             try:
                 self.website.add_to_cart(self.driver, self.timeout, self.id)
-            except:
+            except Exception as e:
                 logger.log("Exception occured while adding to cart...", self.id)
+                logger.log(str(e))
                 continue
 
             try:
                 purchase_result = self.website.checkout(self.driver, self.timeout, self.id)
-            except:
+            except Exception as e:
                 logger.log(f"Exception occured while checking out...", self.id)
+                logger.log(str(e))
                 continue
             if purchase_result:
                 logger.log(f"Purchase successful from {self.website.url}", self.id)
