@@ -23,7 +23,7 @@ def run_tests():
     actual1 = target1.in_stock(t1.driver, t1.timeout)
     logger.log(f"Target in stock:\t{pf(expected1 == actual1)}")
     target1.add_to_cart(t1.driver, t1.timeout)
-    time.sleep(10000)
+    target1.checkout(t1.driver, t1.timeout)
     t1.close()
 
     target2 = websites.Target(target_url_no_stock, True)
@@ -32,5 +32,4 @@ def run_tests():
     actual2 = target2.in_stock(t2.driver, t2.timeout)
     logger.log(f"Target no stock:\t{pf(expected2 == actual2)}")
     t2.close()
-
     logger.log("TESTS END------------------------------------------------")

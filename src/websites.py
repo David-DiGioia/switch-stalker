@@ -4,7 +4,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import time
 import logger
-from selenium.webdriver import ActionChains
 
 button_online_html = '<button data-test="shippingATCButton" type="button" class="Button-bwu3xu-0 defxwW">Ship it</button>'
 button_online_css = "button[data-test='shippingATCButton'][type='button'][class='Button-bwu3xu-0 defxwW']"
@@ -13,6 +12,8 @@ decline_coverage_button_css = "button[data-test='espModalContent-declineCoverage
 
 email = ''
 password = ''
+ccn = ''
+sc = ''
 
 
 # Wait for css element to be clickable then return the element. Return None if timeout occurs.
@@ -35,27 +36,49 @@ def wait_click_css(css, driver, timeout):
 
 
 class Target:
-    def __init__(self, url, online):
+    def __init__(self, url, online=True):
+        self.name = 'Target'
         self.url = url
         if online:
             self.purchase_button_html = button_online_html
             self.purchase_button_css = button_online_css
+            self.no_purchase_button_css = no_button_online_css
         else:
             self.purchase_button_html = ''
             self.purchase_button_css = ''
+            self.no_purchase_button_css = ''
 
     def in_stock(self, driver, timeout):
-        driver.get(self.url)
-        if wait_css(self.purchase_button_css, driver, timeout):
+        if wait_css(self.purchase_button_css + ', ' + self.no_purchase_button_css, driver, timeout):
             return self.purchase_button_html in driver.page_source
         return False
 
     def add_to_cart(self, driver, timeout):
+        # Click purchase button
         wait_click_css(self.purchase_button_css, driver, timeout)
+        # Exit from popup
+        wait_click_css('button[aria-label="close"][type="button"][style="position: absolute; top: 5px; right: 5px;"]', driver, timeout)
+        wait_click_css('#cart', driver, timeout)
 
-    def checkout(self):
-        pass
+    # Make the purchase. Returns true if successful.
+    def checkout(self, driver, timeout):
+        # Click 'I'm ready to checkout' button
+        if wait_click_css('button[class="Button__ButtonWithStyles-y45r97-0 gmmYfU"][data-test="checkout-button"]', driver, timeout) is None:
+            return False
 
+        # # Select address
+        # wait_click_css('label[class="h-display-block h-position-relative"][data-test="ba9bdaa0-8350-11ea-9dc1-0313c1f58d21"]', driver, timeout)
+        # # Save and continue
+        # wait_click_css('[data-test="save-and-continue-button"][type="button"][class="Button-bwu3xu-0 hYDopb"]', driver, timeout)
+
+        final_button = wait_css('button[class="Button__ButtonWithStyles-y45r97-0 eYxNTC"][data-test="placeOrderButton"]', driver, timeout)
+        if final_button is None:
+            return False
+        logger.log(f"This is where we would check out. Button is: {final_button}")
+        return True
+
+
+    # Logging in automatically makes target suspicious so we use cookies now.
     def login(self, driver, timeout):
         driver.get('https://www.target.com/')
         # Click the account menu button
@@ -69,11 +92,5 @@ class Target:
         input_box.send_keys(password)
         # Click checkbox to stay signed in
         wait_click_css('div[for="keep-me-signed-in"][class="Checkbox__CheckboxVisual-n6heu6-5 eASAwe"]', driver, timeout)
+        wait_click_css('#login', driver, timeout)
 
-        # We hold and click the login button so hopefully it doesn't block us for being a bot
-        login_button = wait_css('#login', driver, timeout)
-        actions = ActionChains(driver)
-        actions.move_to_element(login_button).click_and_hold(login_button).perform()
-        actions.click().perform()
-
-        time.sleep(1000000)
