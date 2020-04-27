@@ -1584,3 +1584,12 @@ JavaScript error: https://assets.targetimg1.com/ui/client.2113b1f8.js, line 1: E
 JavaScript error: https://assets.targetimg1.com/ui/client.2113b1f8.js, line 1: Error: "404 Not Found" at [GET] https://redsky.target.com/v1/location_details/77464002?latitude=33.878493&longitude=-84.091091&zip=30047&state=GA&storeId=917&scheduled_delivery_store_id=917&fulfillment_test_mode=grocery_opu_team_member_test
 JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
 JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+1587963399878	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-foreground" "-no-remote" "-profile" "C:\\Users\\David\\AppData\\Local\\Temp\\rust_mozprofilexRsS94"
+1587963400153	addons.webextension.doh-rollout@mozilla.org	WARN	Loading extension 'doh-rollout@mozilla.org': Reading manifest: Invalid extension permission: networkStatus
+1587963400545	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: mozillaAddons
+1587963400545	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: telemetry
+1587963400545	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: resource://pdf.js/
+1587963400545	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: about:reader*
+JavaScript error: resource://gre/modules/XULStore.jsm, line 66: Error: Can't find profile directory.
+1587963401963	Marionette	INFO	Listening on port 55457
+1587963401990	Marionette	WARN	TLS certificate errors will be ignored for this session

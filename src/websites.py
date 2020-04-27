@@ -9,14 +9,7 @@ import options
 button_online_html = '<button data-test="shippingATCButton" type="button" class="Button-bwu3xu-0 defxwW">Ship it</button>'
 button_online_css = "button[data-test='shippingATCButton'][type='button'][class='Button-bwu3xu-0 defxwW']"
 no_button_online_css = "div[data-test='oosDeliveryOption'][class='h-text-orangeDark h-text-md']"
-decline_coverage_button_css = "button[data-test='espModalContent-declineCoverageButton'][type='button'][class='Button-bwu3xu-0 ciMIqu h-margin-t-tight']"
-
 select_address_html = 'label[class="h-display-block h-position-relative"][data-test="ba9bdaa0-8350-11ea-9dc1-0313c1f58d21"]'
-
-email = ''
-password = ''
-ccn = ''
-sc = ''
 
 
 # Wait for css element to be clickable then return the element. Return None if timeout occurs.
@@ -87,7 +80,7 @@ class Target:
         if step <= 1:
             # Click box and enter credit card number
             ccn_input_box = wait_click_css('#creditCardInput-cardNumber', driver, timeout, task_id)
-            ccn_input_box.send_keys(ccn)
+            ccn_input_box.send_keys(options.ccn)
             # Click 'confirm card' button
             wait_click_css('button[data-test="verify-card-button"][type="button"][class="Button-bwu3xu-0 hYDopb"]', driver, timeout, task_id)
 
@@ -95,7 +88,7 @@ class Target:
         if step <= 2:
             # Click box and enter credit card number
             sc_input_box = wait_click_css('#creditCardInput-cvv', driver, timeout, task_id)
-            sc_input_box.send_keys(sc)
+            sc_input_box.send_keys(options.sc)
             # <button data-test="save-and-continue-button" type="button" class="Button-bwu3xu-0 hYDopb">
             wait_click_css('button[data-test="save-and-continue-button"][type="button"][class="Button-bwu3xu-0 hYDopb"]', driver, timeout, task_id)
 
@@ -139,7 +132,10 @@ class Target:
                 return self.checkout_starting_from(3, driver, timeout, task_id)
 
     # Logging in automatically makes target suspicious so we use cookies now.
+    # [Deprecated]
     def login(self, driver, timeout, task_id):
+        email = ''
+        password = ''
         driver.get('https://www.target.com/')
         # Click the account menu button
         wait_click_css('.AccountLink__SvgUserWrapper-gx13jw-0.btJnUL', driver, timeout, task_id)

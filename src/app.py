@@ -12,6 +12,8 @@ target_url_in_stock = "https://www.target.com/p/super-mario-maker-2-nintendo-swi
 
 
 def main():
+    # Get profile information
+    options.read_profile()
     if options.run_tests and options.debug:
         tests.run_tests()
 
