@@ -1,7 +1,7 @@
 import logger
 
 # CAUTION setting debug to False will result in actual purchases
-debug = False
+debug = True
 run_tests = False
 rewrite_cookies = False
 

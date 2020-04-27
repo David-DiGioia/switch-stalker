@@ -4,3 +4,4 @@ src/__pycache__
 profile.txt
 Cookies.pkl
 Logfile*
+geckodriver.log

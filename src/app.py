@@ -22,22 +22,23 @@ def main():
     if options.run_tests and options.debug:
         tests.run_tests()
 
-    # target_neon = websites.Target(target_neon_url)
-    # task1 = task.Task(target_neon)
-    # task1.start()
+    tasks = []
 
-    # target_grey = websites.Target(target_grey_url)
-    # task2 = task.Task(target_grey)
-    # task2.start()
-
-    # if options.debug:
-    #     target_in_stock = websites.Target(target_url_in_stock)
-    #     task3 = task.Task(target_in_stock)
-    #     task3.start()
-
-    # smyths_test = websites.SmythsToys(smyth_in_stock_url)
-    # task4 = task.Task(smyths_test)
-    # task4.start()
+    f = open('websites.txt', 'r')
+    lines = f.readlines()
+    for line in lines:
+        if len(line) < 2:
+            continue
+        if line.split()[0] == 'SmythsToys':
+            smyths_toys = websites.SmythsToys(line.split()[1])
+            t = task.Task(smyths_toys)
+            t.start()
+            tasks.append(t)
+        elif line.split()[0] == 'Target':
+            target = websites.Target(line.split()[1])
+            t = task.Task(target)
+            t.start()
+            tasks.append(t)
 
 
 if __name__ == "__main__":
