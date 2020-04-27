@@ -10,7 +10,7 @@ thread_id = 0
 
 
 class Task:
-    def __init__(self, website, sleep_time=1, timeout=10):
+    def __init__(self, website, sleep_time=0, timeout=10):
         global thread_id
         thread_id += 1
         self.id = thread_id
