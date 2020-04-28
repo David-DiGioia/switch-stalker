@@ -23,6 +23,22 @@ password            (password associated with Smyths Toys)
 
 If you are only using target, you can put random text for the lines associated with Smyths toys.
 
+Edit the file websites.txt in the src folder to choose how many tasks you want and the URLs for each.
+Make sure it matches the format
+
+```
+StoreName url_to_item
+```
+
+For example,
+
+```
+Target https://www.target.com/p/nintendo-switch-with-neon-blue-and-neon-red-joy-con/-/A-77464001
+SmythsToys https://www.smythstoys.com/uk/en-gb/video-games-and-tablets/nintendo-gaming/nintendo-switch/nintendo-switch-consoles/nintendo-switch-animal-crossing-limited-edition-console/p/187118
+```
+
+Each line in websites.txt starts one task which makes a single purchase. So the example above would start two tasks.
+
 <h3>Target</h3>
 Target requires you to sign in before making a purchase, and blocks bots from repeatedly logging in on the site.
 To get around this, we use cookies which remember your login info so the bot doesn't need to log in.
