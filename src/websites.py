@@ -21,6 +21,9 @@ def wait_css(css, driver, timeout, task_id):
     except TimeoutException:
         logger.log(f"Timed out waiting for css element to be clickable: {css}", task_id)
         return None
+    except Exception as e:
+        logger.log(str(e))
+        return None
     return driver.find_element_by_css_selector(css)
 
 
@@ -32,6 +35,9 @@ def wait_click_css(css, driver, timeout, task_id):
             element.click()
         except ElementClickInterceptedException:
             driver.execute_script("arguments[0].click();", element)
+        except Exception as e:
+            logger.log(str(e))
+            return None
         return element
     return None
 
@@ -41,6 +47,9 @@ def immediate_active_css(css, driver):
     try:
         element = driver.find_element_by_css_selector(css)
     except NoSuchElementException:
+        return None
+    except Exception as e:
+        logger.log(str(e))
         return None
     if element.is_displayed() and element.is_enabled():
         return element
