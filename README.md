@@ -10,6 +10,9 @@ Bot for purchasing from websites. Supports Target and Smyths Toys.
 
 <h2>Set up</h2>
 <h3>General</h3>
+
+Make sure a new version of Firefox is installed on your computer.
+
 In the src folder you must add a file named profile.txt. It should match the following format (without the statements in parenthesis):
 
 ```
