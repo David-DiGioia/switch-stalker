@@ -3,6 +3,7 @@ import task
 import websites
 import options
 import logger
+import sys
 
 # TARGET
 # Legit
@@ -17,6 +18,10 @@ smyth_no_stock_url = 'https://www.smythstoys.com/uk/en-gb/video-games-and-tablet
 
 
 def main():
+    # Command line arguments
+    if len(sys.argv) >= 2 and sys.argv[1] == options.cookie_arg:
+        options.rewrite_cookies = True
+
     logger.init_logger()
     options.read_profile()
     if options.run_tests and options.debug:

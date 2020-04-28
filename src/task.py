@@ -21,12 +21,12 @@ class Task:
 
         if options.rewrite_cookies:
             self.driver.get(website.url)
-            logger.log("Enter anything to continue, once you have logged in.", self.id)
+            logger.log(f"Log into {website.name}, checking 'Keep me signed in' then press enter in the terminal.", self.id)
             input()
-            logger.log("continuing....", self.id)
+            logger.log("Saving cookies...", self.id)
             pickle.dump(self.driver.get_cookies(), open("Cookies.pkl", "wb"))
-            logger.log("Finished storing cookies.", self.id)
-            time.sleep(10000)
+            logger.log("Finished storing cookies. You may now run the program without passing " + options.cookie_arg, self.id)
+            exit(0)
         else:
             self.website.login(self.driver, self.timeout, self.id)
 
@@ -41,7 +41,7 @@ class Task:
                     logger.log(f"Reloading webpage timed out...", self.id)
                 except Exception as e:
                     logger.log(f"Unexpected error loading page... Continuing.", self.id)
-                    logger.log(str(e))
+                    logger.log_exception(e, self.id)
                 continue
             logger.log(f"{self.website.name} is in stock!", self.id)
 
@@ -49,14 +49,14 @@ class Task:
                 self.website.add_to_cart(self.driver, self.timeout, self.id)
             except Exception as e:
                 logger.log("Exception occured while adding to cart...", self.id)
-                logger.log(str(e))
+                logger.log_exception(e, self.id)
                 continue
 
             try:
                 purchase_result = self.website.checkout(self.driver, self.timeout, self.id)
             except Exception as e:
                 logger.log(f"Exception occured while checking out...", self.id)
-                logger.log(str(e))
+                logger.log_exception(e, self.id)
                 continue
             if purchase_result:
                 logger.log(f"Purchase successful from {self.website.url}", self.id)

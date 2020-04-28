@@ -2,7 +2,6 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException,
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select
 import time
 import logger
 import options
@@ -22,7 +21,7 @@ def wait_css(css, driver, timeout, task_id):
         logger.log(f"Timed out waiting for css element to be clickable: {css}", task_id)
         return None
     except Exception as e:
-        logger.log(str(e))
+        logger.log_exception(e, task_id)
         return None
     return driver.find_element_by_css_selector(css)
 
@@ -36,20 +35,20 @@ def wait_click_css(css, driver, timeout, task_id):
         except ElementClickInterceptedException:
             driver.execute_script("arguments[0].click();", element)
         except Exception as e:
-            logger.log(str(e))
+            logger.log_exception(e, task_id)
             return None
         return element
     return None
 
 
 # If element is found, return it. Otherwise, return None.
-def immediate_active_css(css, driver):
+def immediate_active_css(css, driver, task_id):
     try:
         element = driver.find_element_by_css_selector(css)
     except NoSuchElementException:
         return None
     except Exception as e:
-        logger.log(str(e))
+        logger.log_exception(e, task_id)
         return None
     if element.is_displayed() and element.is_enabled():
         return element
@@ -128,39 +127,37 @@ class Target:
 
         while True:
             # Select address
-            if immediate_active_css(select_address_html, driver) is not None:
+            if immediate_active_css(select_address_html, driver, task_id) is not None:
                 logger.log("Checking out from stage 0 (address).", task_id)
                 return self.checkout_starting_from(0, driver, timeout, task_id)
 
             # Enter credit card number
-            if immediate_active_css('#creditCardInput-cardNumber', driver) is not None:
+            if immediate_active_css('#creditCardInput-cardNumber', driver, task_id) is not None:
                 logger.log("Checking out from stage 1 (credit card number).", task_id)
                 return self.checkout_starting_from(1, driver, timeout, task_id)
 
             # Do security code here
-            if immediate_active_css('#creditCardInput-cvv', driver) is not None:
+            if immediate_active_css('#creditCardInput-cvv', driver, task_id) is not None:
                 logger.log("Checking out from stage 2 (security code).", task_id)
                 return self.checkout_starting_from(2, driver, timeout, task_id)
 
             # Check for final button
-            if immediate_active_css('button[class="Button__ButtonWithStyles-y45r97-0 eYxNTC"][data-test="placeOrderButton"]', driver):
+            if immediate_active_css('button[class="Button__ButtonWithStyles-y45r97-0 eYxNTC"][data-test="placeOrderButton"]', driver, task_id):
                 logger.log("Checking out from stage 3 (Place order button).", task_id)
                 return self.checkout_starting_from(3, driver, timeout, task_id)
 
     def login(self, driver, timeout, task_id):
         driver.get(self.url)
+        logger.log(f"Loading cookies...", task_id)
         for cookie in pickle.load(open("Cookies.pkl", "rb")):
-            logger.log(f"Loading cookie {cookie}", task_id)
             driver.add_cookie(cookie)
-
-
+        logger.log("Finished loading cookies.", task_id)
 
 
 class SmythsToys:
     def __init__(self, url, online=True):
         self.name = 'SmythsToys'
         self.url = url
-
 
     def in_stock(self, driver, timeout, task_id):
         add_to_basket_button = wait_css('#addToCartButton', driver, 5, task_id)
@@ -186,7 +183,7 @@ class SmythsToys:
         # Select month
         wait_click_css('button[type="button"][class="btn dropdown-toggle selectpicker contact_select"][data-toggle="dropdown"][data-id="expiryMonth"]', driver, timeout, task_id)
         wait_click_css('li[rel="' + str(int(options.month)) + '"]', driver, timeout, task_id)
-        #Select Year
+        # Select Year
         wait_click_css('button[type="button"][class="btn dropdown-toggle selectpicker contact_select"][data-toggle="dropdown"][data-id="expiryYear"]', driver, timeout, task_id)
         element = WebDriverWait(driver, timeout).until(EC.element_to_be_clickable((By.LINK_TEXT, "20" + options.year[:-1])))
         element.click()

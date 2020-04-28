@@ -3,7 +3,11 @@ import logger
 # CAUTION setting debug to False will result in actual purchases
 debug = False
 run_tests = False
+# Set this to True by passing cookie_arg command line argument
 rewrite_cookies = False
+
+# Command line arguments
+cookie_arg = '-c'
 
 # Credit card number and security code
 ccn = ''
@@ -12,6 +16,7 @@ month = ''
 year = ''
 email = ''
 password = ''
+
 
 def read_profile():
     logger.log("Reading profile")
@@ -23,4 +28,3 @@ def read_profile():
     year = file.readline()
     email = file.readline()
     password = file.readline()
-    # print("20" + year[:-1] + "AFTER")
