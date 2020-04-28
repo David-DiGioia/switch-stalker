@@ -1,0 +1,1 @@
+Log every action that's taken and sort the logs by date
