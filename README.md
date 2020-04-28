@@ -89,4 +89,4 @@ You only have to do this setup process once.
 The reason for not entering the credit card information and instead letting the bot handle it is because I don't want to have
 my credit card info stored on some random toy store's website. If this causes any problems for you, let me know.
 
-[Smyths Toys website]: https://www.smythstoys.com/uk/en-gb/login
+Disclaimer: I have not made a purchase on Smyths Toys to test this bot. I have tested it up until entering (incorrect) credit card information and clicking the place order button, which tells me that the credit card information is incorrect. It's likely it will work with correct credit card information, but if there are any more steps after clicking 'place order' (like a popup or something) then that would be a problem. If you would like to test making a purchase with it you can let me know if you encounter any errors and I will fix it.
