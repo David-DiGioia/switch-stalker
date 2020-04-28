@@ -69,7 +69,7 @@ class Target:
             self.no_purchase_button_css = ''
 
     def in_stock(self, driver, timeout, task_id):
-        if wait_css(self.purchase_button_css + ', ' + self.no_purchase_button_css, driver, timeout, task_id):
+        if wait_css(self.purchase_button_css + ', ' + self.no_purchase_button_css, driver, timeout, task_id) is not None:
             return self.purchase_button_html in driver.page_source
         return False
 
@@ -142,7 +142,7 @@ class Target:
                 return self.checkout_starting_from(2, driver, timeout, task_id)
 
             # Check for final button
-            if immediate_active_css('button[class="Button__ButtonWithStyles-y45r97-0 eYxNTC"][data-test="placeOrderButton"]', driver, task_id):
+            if immediate_active_css('button[class="Button__ButtonWithStyles-y45r97-0 eYxNTC"][data-test="placeOrderButton"]', driver, task_id) is not None:
                 logger.log("Checking out from stage 3 (Place order button).", task_id)
                 return self.checkout_starting_from(3, driver, timeout, task_id)
 
